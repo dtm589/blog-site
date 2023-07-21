@@ -5,15 +5,23 @@ const routes = require('./controllers');
 const helpers = require('./utils/helpers');
 const sequelize = require('./config/connection');
 const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Set up sessions
+// Set up sessions with cookies
 const sess = {
     secret: 'Super secret secret',
+    cookie: {
+        // Stored in milliseconds
+        maxAge: 60 * 1000 * 5, // expires after 5 minutes DEFAULT VALUE IS SET TO SESSION, so it will clear after you ex the window 
+    },
     resave: false,
     saveUninitialized: true,
+    store: new SequelizeStore({     //Store the value of the session in the sequlize db
+        db: sequelize,
+    }),
 };
 
 app.use(session(sess));
